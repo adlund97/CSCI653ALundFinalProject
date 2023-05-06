@@ -4,8 +4,10 @@ const State = require('../models/stateModel')
 // route:   GET /api/states
 // access:  Private
 const getStates = async (req, res) => {
+    console.log(req.codes)
     res.status(200).json({ message: 'Get States' })
 }
+
 
 // desc:    Creates State information
 // route:   POST /api/states

@@ -1,5 +1,6 @@
 const express = require('express')
 const router = express.Router()
+const { verifyStates } = require('../middleware/verifyStates')
 const {
     getStates,
     setStates,
@@ -7,7 +8,7 @@ const {
     deleteStates 
 } = require('../controllers/stateController')
 
-router.route('/').get(getStates).post(setStates)
-router.route('/:id').patch(updateStates).delete(deleteStates)
+router.route('/', verifyStates).get(getStates).post(setStates)
+router.route('/:state').patch(updateStates).delete(deleteStates)
 
 module.exports = router

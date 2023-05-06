@@ -1,10 +1,13 @@
 const mongoose = require('mongoose')
 
 const stateSchema = mongoose.Schema({
-    text: {
+    stateCode: {
         type: String,
         required: true,
         unique: true
+    },
+    funfacts: {
+        type: [String]
     }
 })
 
