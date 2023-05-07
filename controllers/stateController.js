@@ -33,7 +33,7 @@ const getStates = async (req, res) => {
 // route:   GET /api/states/:state
 const getSingleState = async (req, res) => {
     result = await addFacts(data.states.filter(element => (element.code == req.code)))
-    res.status(200).json(result)
+    res.status(200).json(result[0])
 }
 
 // desc:    Gets Funfact from a state
@@ -42,7 +42,7 @@ const getFunfact = async (req, res) => {
     result = await State.findOne({ stateCode: req.code }).exec()
     if (result != undefined && result.funfacts != undefined) {
         randomFact = Math.floor(Math.random() * result.funfacts.length)
-        res.status(200).json(result.funfacts[randomFact])
+        res.status(200).json({ "funfact": result.funfacts[randomFact] })
         return
     } else {
         none = data.states.find(element => element.code == req.code)
@@ -71,7 +71,8 @@ const getNickname = async (req, res) => {
 // route:   GET /api/states/:state/population
 const getPoplulation = async (req, res) => {
     result = data.states.filter(element => (element.code == req.code))
-    population = {"state": `${result[0].state}`, "population": `${result[0].population}`}
+    formatted = result[0].population.toLocaleString("en-US")
+    population = {"state": `${result[0].state}`, "population": `${formatted}`}
     res.status(200).json(population)
 }
 
@@ -124,6 +125,9 @@ const patchFunfact = async (req, res) => {
     if (result != undefined) {
         facts.funfacts[req.body.index - 1] = req.body.funfact
         await facts.save()
+    } else if (facts.funfacts == []) {
+        none = data.states.find(element => element.code == req.code)
+        res.status(404).json({ 'message': `No Fun Fact found for ${none.state}` })
     } else {
         none = data.states.find(element => element.code == req.code)
         res.status(404).json({ 'message': `No Fun Fact found at that index for ${none.state}` })
@@ -145,6 +149,9 @@ const deleteFunfact = async (req, res) => {
     if (result != undefined) {
         facts.funfacts = facts.funfacts.filter(element => (element != result))
         await facts.save()
+    } else if (facts.funfacts == []) {
+        none = data.states.find(element => element.code == req.code)
+        res.status(404).json({ 'message': `No Fun Fact found for ${none.state}` })
     } else {
         none = data.states.find(element => element.code == req.code)
         res.status(404).json({ 'message': `No Fun Fact found at that index for ${none.state}` })
