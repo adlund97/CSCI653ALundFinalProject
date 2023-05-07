@@ -121,20 +121,18 @@ const patchFunfact = async (req, res) => {
     }
 
     facts = await State.findOne({ stateCode: req.code }).exec()
-    result = facts.funfacts[req.body.index - 1]
-    if (result != undefined) {
+    if (facts == undefined) {
+        none = data.states.find(element => element.code == req.code)
+        res.status(404).json({ 'message': `No Fun Facts found for ${none.state}` })
+    } else if (facts.funfacts[req.body.index - 1] != undefined) {
         facts.funfacts[req.body.index - 1] = req.body.funfact
         await facts.save()
-    } else if (facts.funfacts == []) {
-        none = data.states.find(element => element.code == req.code)
-        res.status(404).json({ 'message': `No Fun Fact found for ${none.state}` })
     } else {
         none = data.states.find(element => element.code == req.code)
         res.status(404).json({ 'message': `No Fun Fact found at that index for ${none.state}` })
     }
     res.status(200).json(facts)
 }
-
 
 // -------------------------------------------DELETE
 // desc:    Deletes States information
@@ -145,13 +143,12 @@ const deleteFunfact = async (req, res) => {
     }
 
     const facts = await State.findOne({ stateCode: req.code }).exec()
-    result = facts.funfacts[req.body.index - 1]
-    if (result != undefined) {
-        facts.funfacts = facts.funfacts.filter(element => (element != result))
-        await facts.save()
-    } else if (facts.funfacts == []) {
+    if (facts == undefined) {
         none = data.states.find(element => element.code == req.code)
-        res.status(404).json({ 'message': `No Fun Fact found for ${none.state}` })
+        res.status(404).json({ 'message': `No Fun Facts found for ${none.state}` })
+    } else if (facts.funfacts[req.body.index - 1] != undefined) {
+        facts.funfacts = facts.funfacts.filter(element => (element != facts.funfacts[req.body.index - 1]))
+        await facts.save()
     } else {
         none = data.states.find(element => element.code == req.code)
         res.status(404).json({ 'message': `No Fun Fact found at that index for ${none.state}` })
